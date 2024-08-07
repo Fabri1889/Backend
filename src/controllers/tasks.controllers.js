@@ -1,14 +1,16 @@
 import Task from "../models/task.model.js";
 
+// Controlador para obtener todas las tareas del usuario autenticado
 export const getTasks = async (req, res) => {
   try {
-    const tasks = await Task.find({ user : req.user.id }).populate("user");
+    const tasks = await Task.find({ user: req.user.id }).populate("user");
     res.json(tasks);
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
 };
 
+// Controlador para crear una nueva tarea
 export const createTask = async (req, res) => {
   try {
     const { title, description, date } = req.body;
@@ -25,6 +27,7 @@ export const createTask = async (req, res) => {
   }
 };
 
+// Controlador para eliminar una tarea por su ID
 export const deleteTask = async (req, res) => {
   try {
     const deletedTask = await Task.findByIdAndDelete(req.params.id);
@@ -37,6 +40,7 @@ export const deleteTask = async (req, res) => {
   }
 };
 
+// Controlador para actualizar una tarea por su ID
 export const updateTask = async (req, res) => {
   try {
     const { title, description, date } = req.body;
@@ -51,6 +55,7 @@ export const updateTask = async (req, res) => {
   }
 };
 
+// Controlador para obtener una tarea por su ID
 export const getTask = async (req, res) => {
   try {
     const task = await Task.findById(req.params.id);
