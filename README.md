@@ -1,3 +1,3 @@
-Integrantes: Diaz, Emiliano
-Diaz, Fabricio
-Zancocchia, Franco
+Integrantes: Diaz Emiliano
+Diaz Fabricio
+Zancocchia Franco
