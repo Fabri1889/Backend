@@ -9,6 +9,7 @@ import { FRONTEND_URL } from "./config.js";
 
 const app = express();
 
+// Configura CORS para permitir solicitudes del frontend
 app.use(
   cors({
     credentials: true,
@@ -16,12 +17,14 @@ app.use(
   })
 );
 app.use(express.json());
-app.use(morgan("dev"));
-app.use(cookieParser());
+app.use(morgan("dev")); // Logger para solicitudes HTTP
+app.use(cookieParser()); // Middleware para parsear cookies
 
+// Define las rutas de autenticación y tareas
 app.use("/api/auth", authRoutes);
 app.use("/api", taksRoutes);
 
+// Configuración para servir el frontend en producción
 if (process.env.NODE_ENV === "production") {
   const path = await import("path");
   app.use(express.static("client/dist"));
