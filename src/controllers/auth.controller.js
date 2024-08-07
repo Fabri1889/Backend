@@ -4,41 +4,45 @@ import bcrypt from "bcryptjs";
 import { TOKEN_SECRET } from "../config.js";
 import { createAccessToken } from "../libs/jwt.js";
 
+// Controlador para el registro de usuarios
 export const register = async (req, res) => {
   try {
     const { username, email, password } = req.body;
 
+    // Verifica si el email ya está registrado
     const userFound = await User.findOne({ email });
 
     if (userFound)
       return res.status(400).json({
-        message: ["El email ya esta en uso"],
+        message: ["El email ya está en uso"],
       });
 
-    // hashing the password
+    // Hashing del password
     const passwordHash = await bcrypt.hash(password, 10);
 
-    // creating the user
+    // Creación del nuevo usuario
     const newUser = new User({
       username,
       email,
       password: passwordHash,
     });
 
-    // saving the user in the database
+    // Guardando el usuario en la base de datos
     const userSaved = await newUser.save();
 
-    // create access token
+    // Creación del token de acceso
     const token = await createAccessToken({
       id: userSaved._id,
     });
 
+    // Configuración de la cookie con el token
     res.cookie("token", token, {
       httpOnly: process.env.NODE_ENV !== "development",
       secure: true,
       sameSite: "none",
     });
 
+    // Respuesta con los datos del usuario
     res.json({
       id: userSaved._id,
       username: userSaved.username,
@@ -49,6 +53,7 @@ export const register = async (req, res) => {
   }
 };
 
+// Controlador para el inicio de sesión de usuarios
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -59,6 +64,7 @@ export const login = async (req, res) => {
         message: ["El email no existe"],
       });
 
+    // Comparación de la contraseña ingresada con la almacenada
     const isMatch = await bcrypt.compare(password, userFound.password);
     if (!isMatch) {
       return res.status(400).json({
@@ -66,17 +72,20 @@ export const login = async (req, res) => {
       });
     }
 
+    // Creación del token de acceso
     const token = await createAccessToken({
       id: userFound._id,
       username: userFound.username,
     });
 
+    // Configuración de la cookie con el token
     res.cookie("token", token, {
       httpOnly: process.env.NODE_ENV !== "development",
       secure: true,
       sameSite: "none",
     });
 
+    // Respuesta con los datos del usuario
     res.json({
       id: userFound._id,
       username: userFound.username,
@@ -87,6 +96,7 @@ export const login = async (req, res) => {
   }
 };
 
+// Controlador para verificar el token
 export const verifyToken = async (req, res) => {
   const { token } = req.cookies;
   if (!token) return res.send(false);
@@ -105,6 +115,7 @@ export const verifyToken = async (req, res) => {
   });
 };
 
+// Controlador para cerrar sesión
 export const logout = async (req, res) => {
   res.cookie("token", "", {
     httpOnly: true,
